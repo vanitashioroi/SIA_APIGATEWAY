@@ -5,6 +5,9 @@ namespace App\Exceptions;
 use App\Traits\ApiResponser;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+
+use GuzzleHttp\Exception\ClientException;
+
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
@@ -22,7 +25,10 @@ class Handler extends ExceptionHandler
      * @var array
      */
     protected $dontReport = [
-        // Add exceptions that shouldn't be reported
+        AuthorizationException::class,
+        HttpException::class,
+        ModelNotFoundException::class,
+        ValidationException::class,
     ];
 
     /**
@@ -66,17 +72,17 @@ class Handler extends ExceptionHandler
             return $this->errorResponse($exception->getMessage(), Response::HTTP_FORBIDDEN);
         }
 
-        if ($exception instanceof ClientExpectation) {
-            $message = $exception->getResponse()->getBody();
-            $code = $exception->getCode();
-
-            return $this->errorMessage($message,200);
-        }
-
         // Unauthorized access
         if ($exception instanceof AuthenticationException) {
             return $this->errorResponse($exception->getMessage(), Response::HTTP_UNAUTHORIZED);
         }
+
+        if ($exception instanceof ClientException) {
+            $message = $exception->getResponse()->getBody();
+            $code = $exception->getCode();
+        
+            return $this->errorResponse($message, 200);
+        }        
 
         // If you are running in development environment
         if (env('APP_DEBUG', false)) {
