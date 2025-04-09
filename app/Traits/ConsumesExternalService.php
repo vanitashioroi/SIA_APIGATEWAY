@@ -23,6 +23,10 @@ trait ConsumesExternalService
             'base_uri' => $this->baseUri,
         ]);
 
+        if (!isset($headers['Authorization']) && isset($this->secret)) {
+            $headers['Authorization'] = $this->secret;
+        }        
+
         // Perform the request (method, URL, form parameters, headers)
         $response = $client->request($method, $requestUrl, ['form_params' =>
              $form_params, 'headers' => $headers,]);

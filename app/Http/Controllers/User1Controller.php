@@ -53,7 +53,7 @@ class User1Controller extends Controller
      */
     public function update(Request $request,$id)
     {
-        return $this->successsResponse($this-user1Service->editUser1($request->all(), $id));
+        return $this->successResponse($this->user1Service->editUser1($request->all(), $id));
     }
 
     /**
@@ -62,7 +62,7 @@ class User1Controller extends Controller
 
      public function delete($id)
      {
-        return $this->successResponse($this->user1Service->user1Service->deleteUser1($id));
+        return $this->successResponse($this->user1Service->deleteUser1($id));
      }
 
 }

@@ -78,11 +78,12 @@ class Handler extends ExceptionHandler
         }
 
         if ($exception instanceof ClientException) {
-            $message = $exception->getResponse()->getBody();
-            $code = $exception->getCode();
+            $response = $exception->getResponse();
+            $body = json_decode((string) $response->getBody(), true);
+            $status = $response->getStatusCode();
         
-            return $this->errorResponse($message, 200);
-        }        
+            return response()->json($body, $status);
+        }                       
 
         // If you are running in development environment
         if (env('APP_DEBUG', false)) {
