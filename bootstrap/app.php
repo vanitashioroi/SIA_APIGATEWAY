@@ -15,10 +15,12 @@ $app = new Laravel\Lumen\Application(
 $app->withFacades();
 $app->withEloquent();
 
+// Load config files
 $app->configure('app');
 $app->configure('auth');
 $app->configure('services');
 
+// Bind core services
 $app->singleton(
     Illuminate\Contracts\Debug\ExceptionHandler::class,
     App\Exceptions\Handler::class
@@ -29,24 +31,18 @@ $app->singleton(
     App\Console\Kernel::class
 );
 
-// Middleware
+// Register route middleware
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
-    'client.credentials' => Dusterio\LumenPassport\Http\Middleware\CheckClientCredentials::class,
+    'client.credentials' => App\Http\Middleware\CheckClientCredentials::class,
 ]);
 
-// Service Providers
+// Register service providers
 $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
+$app->register(Dusterio\LumenPassport\PassportServiceProvider::class); // ✅ Always register this
 
-// ✅ Register Laravel Passport for /oauth/token to work
-//$app->register(Laravel\Passport\PassportServiceProvider::class);
-
-// ✅ Register Dusterio only in console for keys/seeding/etc
-if ($app->runningInConsole()) {
-    $app->register(Dusterio\LumenPassport\PassportServiceProvider::class);
-}
-
+// Load routes
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
 ], function ($router) {
