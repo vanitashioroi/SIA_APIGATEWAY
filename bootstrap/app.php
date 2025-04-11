@@ -19,6 +19,8 @@ $app->withEloquent();
 $app->configure('app');
 $app->configure('auth');
 $app->configure('services');
+$app->configure('database');
+
 
 // Bind core services
 $app->singleton(
