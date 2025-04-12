@@ -15,14 +15,10 @@ $app = new Laravel\Lumen\Application(
 $app->withFacades();
 $app->withEloquent();
 
-// Load config files
-$app->configure('app');
-$app->configure('auth');
 $app->configure('services');
-$app->configure('database');
+$app->configure('auth');
+$app->configure('app');
 
-
-// Bind core services
 $app->singleton(
     Illuminate\Contracts\Debug\ExceptionHandler::class,
     App\Exceptions\Handler::class
@@ -33,18 +29,20 @@ $app->singleton(
     App\Console\Kernel::class
 );
 
-// Register route middleware
+// Register route middleware, including the new gateway authentication middleware.
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
-    'client.credentials' => App\Http\Middleware\CheckClientCredentials::class,
+    'gateway.auth' => App\Http\Middleware\GatewayAuthenticate::class,
 ]);
 
-// Register service providers
-$app->register(App\Providers\AppServiceProvider::class);
+// Register Service Providers
 $app->register(App\Providers\AuthServiceProvider::class);
-$app->register(Dusterio\LumenPassport\PassportServiceProvider::class); // ✅ Always register this
 
-// Load routes
+// Remove any Passport providers:
+// $app->register(Laravel\Passport\PassportServiceProvider::class);
+// $app->register(Dusterio\LumenPassport\PassportServiceProvider::class);
+
+// Register your routes:
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
 ], function ($router) {
